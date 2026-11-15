@@ -9,6 +9,7 @@ macOS, Homebrew, App Store, TeX Live, npm, Python, VS Code, KI-Werkzeuge und meh
 
 **▶ [Projektseite](https://bingerminger.github.io/update-all/)** — alles auf einen Blick, mit Aufnahmen und Schnellstart.
 
+[![Version](https://img.shields.io/github/v/release/Bingerminger/update-all?label=version&color=blue)](CHANGELOG.md)
 [![Prüfen](https://github.com/Bingerminger/update-all/actions/workflows/ci.yml/badge.svg)](https://github.com/Bingerminger/update-all/actions/workflows/ci.yml)
 [![Lizenz: MIT](https://img.shields.io/badge/Lizenz-MIT-blue.svg)](LICENSE)
 ![macOS](https://img.shields.io/badge/macOS-Apple%20Silicon-lightgrey.svg)
