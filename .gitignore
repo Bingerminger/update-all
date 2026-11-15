@@ -1,0 +1,19 @@
+# ============================================================
+# update-all — .gitignore
+#
+# Grundprinzip: Der Code ist öffentlich, der Rechner ist privat.
+# Alles, was zu EINEM konkreten Mac gehört (prefs, Logs, Notizen zu
+# Vorfällen, App-Inventar), bleibt lokal und geht nie ins Repository.
+# prefs.example zeigt die Einstellungen ohne persönliche Werte.
+# ============================================================
+
+# --- Lokale Notizen & Arbeitsstand (NIE committen) ---
+CLAUDE.local.md
+ideen.local.md
+.claude/
+
+# --- Tooling-Artefakte (generiert) ---
+.DS_Store
+graphify-out/
+.playwright-mcp/
+docs/.render/

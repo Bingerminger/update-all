@@ -1,0 +1,46 @@
+name: Prüfen
+
+# Syntax, Selbsttest, ein Dry-Run und die headless TUI-Tests (eigener tmux-Socket, eigene
+# Logs und prefs) auf einem macOS-Runner — bei jedem Push auf main, bei Pull Requests und
+# von Hand. Nur Leserechte. Hinweis: In privaten Repos zählen macOS-Minuten zehnfach.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: zsh · Selbsttest · TUI
+    runs-on: macos-latest
+    timeout-minutes: 25
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Werkzeuge
+        # tmux + fzf für die Ansicht; mas und composer, weil die TUI-Tests diese Abschnitte nutzen
+        run: |
+          brew install tmux fzf jq mas
+          command -v composer >/dev/null || brew install composer
+          tmux -V; fzf --version; zsh --version
+
+      - name: Syntax
+        run: zsh -n update-all.sh && zsh -n update-all-tuitest.zsh
+
+      - name: Selbsttest
+        run: ./update-all.sh --selftest
+
+      - name: Dry-Run (nichts wird installiert)
+        env:
+          UPDATE_ALL_LOGDIR: ${{ runner.temp }}/ua-logs
+          UPDATE_ALL_CONFDIR: ${{ runner.temp }}/ua-conf
+        run: ./update-all.sh --dry-run --plain -y --no-macos
+
+      - name: TUI-Tests
+        run: ./update-all-tuitest.zsh all

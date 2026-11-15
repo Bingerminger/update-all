@@ -1,0 +1,59 @@
+# update-all — Beispiel für ~/.config/update-all/prefs
+#
+# Eine Einstellung je Zeile, Schlüssel=Wert. Zeilen mit # werden ignoriert — aber nur
+# ganze Zeilen: ein # hinter dem Wert gehörte zum Wert.
+# Nichts davon ist Pflicht: ohne prefs läuft update-all mit sinnvollen Standards.
+# Kopieren:  mkdir -p ~/.config/update-all && cp prefs.example ~/.config/update-all/prefs
+#
+# Listen sind kommagetrennt; wo „Muster“ steht, gelten zsh-Muster wie microsoft-* oder geekbench*.
+
+# ── Rückfragen ──────────────────────────────────────────────────────────────
+# Gemerkte Antworten (bei einer Rückfrage mit i = immer bzw. x = nie gesetzt).
+# Mit -y lautet jede Antwort ja; ohne Terminal (cron, Pipe) bleibt es bei nein.
+# TeX Live (tlmgr update --self --all) ohne Nachfrage: always | never
+#texlive=always
+# npm-Cache ab 3 GB leeren (nur ~/.npm/_cacache, _npx bleibt): always | never
+#npm_cache=always
+
+# ── Homebrew-Sicherheitsnetze ───────────────────────────────────────────────
+# Casks, die brew NIE heben soll (Muster). Standard: parallels,parallels-toolbox —
+# deren Cask-Postflight entfernt den Launch-Daemon, bis die App einmal per GUI startet.
+#cask_exclude=parallels,parallels-toolbox,microsoft-*
+
+# Self-Updater-Casks, deren Major-Sprung gesperrt ist — für Apps, bei denen eine neue
+# Hauptversion Geld oder eine neue Lizenz kostet (Muster; leerer Wert schaltet ab).
+# Standard: geekbench*
+#major_block=geekbench*,carbon-copy-cloner,omnifocus
+
+# Casks, die nie über eine laufende App hinweg gehoben werden (Muster). Laufende Apps
+# der übrigen Casks beendet update-all selbst per SIGTERM und startet sie danach wieder.
+#never_quit=docker-desktop
+
+# Manuell installierte Apps, die der Apps-Radar NIE zur Übernahme in brew vorschlägt —
+# Muster gegen Cask-Namen ODER Bundle-ID (z. B. eine App-Familie, die ihr eigener Launcher
+# pflegt). Standard: parallels. Ein eigener Wert ersetzt den Standard.
+#adopt_ignore=parallels,com.example.*
+
+# ── Ansicht (tmux) ──────────────────────────────────────────────────────────
+# Außerhalb von tmux: das Fenster in dieser Session öffnen, wenn sie läuft (z. B. deine
+# tmuxinator-Arbeitssession). Standard: keine → eigene Session "update-all".
+#tmux_session=work
+
+# Pane-Größen: auto richtet sich nach der Fenstergröße (iPhone, iPad, großer Schirm).
+# auto | wide | compact
+#layout=auto
+
+# ── Speicherbericht ─────────────────────────────────────────────────────────
+# Wo alte Agent-Worktrees gesucht werden: <Ordner>/*/.claude/worktrees.
+# Standard: ~/Code,~/Developer,~/Projects,~/src
+#worktree_roots=~/Code,~/work
+
+# ── Spezialfälle ────────────────────────────────────────────────────────────
+# Ollama mit eigenem LaunchAgent (Label): nach einem Cask-Upgrade den Dienst neu starten
+# (nur wenn er lief) und den App-eigenen Login-Eintrag stilllegen. Ohne Wert bleibt
+# Ollama so, wie die App es einrichtet.
+#ollama_agent=com.example.ollama
+
+# ── Benachrichtigung (optional) ─────────────────────────────────────────────
+# Fazit und offene Aktionen per ntfy schicken (ntfy.sh oder eigener Server).
+#notify=https://ntfy.sh/<dein-topic>
