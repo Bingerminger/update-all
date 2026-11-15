@@ -2,7 +2,7 @@ name: Projektseite
 
 # Die Projektseite auf GitHub Pages (https://bingerminger.github.io/update-all/): site/ plus
 # die Bilder aus docs/ (tools/build-site.sh). Gebaut wird aus dem neuesten Release-Tag — die
-# Seite zeigt, was veröffentlicht ist, nicht den Stand von main:
+# Seite kommt aus main, die angezeigte Version ist die des neuesten Releases:
 #   • beim Veröffentlichen eines GitHub-Releases
 #   • von Hand
 # Kennt der Tag tools/build-site.sh noch nicht, baut der Lauf aus main.
@@ -31,20 +31,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Neuestes Release auschecken
+      # Die Seite kommt aus main (Texte, Links, Impressum lassen sich ohne Release nachziehen);
+      # angezeigt wird die Version des neuesten Releases.
+      - name: Version des neuesten Releases
         env:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
           TAG="$RELEASE_TAG"
-          if [ -z "$TAG" ]; then
-            TAG=$(git tag --list 'v*' --sort=-version:refname | head -n1)
-          fi
-          if [ -n "$TAG" ] && git cat-file -e "$TAG:tools/build-site.sh" 2>/dev/null; then
-            git checkout --quiet "$TAG"
-            echo "Seite aus $TAG"
-          else
-            echo "Seite aus main (${TAG:-kein Tag} enthält tools/build-site.sh noch nicht)"
-          fi
+          [ -n "$TAG" ] || TAG=$(git tag --list 'v*' --sort=-version:refname | head -n1)
+          echo "SITE_VERSION=${TAG#v}" >> "$GITHUB_ENV"
+          echo "Seite aus main, Version ${TAG#v}"
 
       - name: Seite bauen
         run: |

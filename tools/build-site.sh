@@ -20,7 +20,8 @@ done
 (( missing )) && exit 1
 (( check )) && { echo "Projektseite: alle Bilder vorhanden"; exit 0; }
 
-version=$(sed -n 's/^VERSION="\(.*\)"/\1/p' "$root/update-all.sh")
+# SITE_VERSION übersteuert (pages.yml: Version des neuesten Releases, die Seite selbst kommt aus main)
+version=${SITE_VERSION:-$(sed -n 's/^VERSION="\(.*\)"/\1/p' "$root/update-all.sh")}
 [[ -n $version ]] || { echo "VERSION nicht gefunden" >&2; exit 1; }
 rm -rf "$out"; mkdir -p "$out/assets"
 cp "$root"/site/* "$out/"

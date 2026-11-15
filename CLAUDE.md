@@ -18,8 +18,9 @@ Ausgaben, Kommentare und Doku sind **deutsch** — beibehalten.
 `site/index.html` (+ `404.html`) ist die Projektseite auf https://bingerminger.github.io/update-all/.
 `tools/build-site.sh [ziel]` setzt sie mit den Bildern aus `docs/` und `.github/` zusammen und
 ersetzt `{{VERSION}}`; `--check` prüft nur, ob jedes eingebundene Bild existiert. Der Workflow
-`pages.yml` baut beim Veröffentlichen eines GitHub-Releases aus dessen Tag (oder von Hand) —
-die Seite zeigt, was veröffentlicht ist, nicht den Stand von `main`. Lokal ansehen: bauen und
+`pages.yml` baut beim Veröffentlichen eines GitHub-Releases (oder von Hand) aus `main`; die
+angezeigte Version ist die des neuesten Releases (`SITE_VERSION`). Impressum und Datenschutz
+liegen zentral unter https://bingerminger.github.io/impressum/ — jede Seite verlinkt darauf. Lokal ansehen: bauen und
 `python3 -m http.server -d dist/site`. Keine externen Ressourcen (Schriften, CDNs, Tracking).
 Die Umgebung `github-pages` muss Deployments aus Tags `v*` zulassen (Settings → Environments →
 github-pages, neben `main`) — sonst lehnt GitHub das Veröffentlichen aus dem Release-Tag ab
