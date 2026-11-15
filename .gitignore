@@ -17,3 +17,4 @@ ideen.local.md
 graphify-out/
 .playwright-mcp/
 docs/.render/
+dist/

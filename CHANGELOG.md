@@ -14,6 +14,9 @@ Status-Pane, in `history.tsv` und hinter `--version`.
   (Fehler, Idee), Pull-Request-Vorlage, Dependabot für die Actions.
 - TUI-Tests: der tmux-Testserver läuft immer mit zsh (auf CI-Runnern ist `$SHELL` bash).
 - CI: `actions/checkout` per Commit-SHA gepinnt.
+- Projektseite auf GitHub Pages (`site/`, `tools/build-site.sh`, Workflow `pages.yml`): wird
+  beim Veröffentlichen eines Releases aus dessen Tag gebaut.
+- Erstes öffentliches Release.
 
 ## 3.4.1 — 2026-11-15
 

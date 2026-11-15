@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>update-all — der Mac-Updater, der auch per SSH durchläuft</title>
+<meta name="description" content="Ein Befehl hält den ganzen Mac aktuell — macOS, Homebrew, App Store, TeX Live, npm, Python, KI-Werkzeuge. Läuft in tmux weiter, wenn die SSH-Verbindung abreißt, ohne einen einzigen Dialog auf dem Mac-Schirm. Ein zsh-Skript, MIT.">
+<meta name="theme-color" content="#0f1217">
+<link rel="canonical" href="https://bingerminger.github.io/update-all/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="update-all — ein Befehl hält den ganzen Mac aktuell">
+<meta property="og:description" content="Auch per SSH vom iPhone, ohne Dialog auf dem Mac-Schirm. tmux-Ansicht, Sicherheitsnetze, Aktionen mit Fix-Befehl.">
+<meta property="og:url" content="https://bingerminger.github.io/update-all/">
+<meta property="og:image" content="https://bingerminger.github.io/update-all/assets/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f1217'/%3E%3Ctext x='9' y='44' font-family='Menlo,monospace' font-size='34' font-weight='700' fill='%2356b6c2'%3E%24%3C/text%3E%3Ctext x='31' y='44' font-family='Menlo,monospace' font-size='34' font-weight='700' fill='%23e8ebf0'%3E_%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0f1217;--bg2:#151a22;--card:#171c25;--line:#262d39;--text:#e8ebf0;--muted:#a3abb9;--dim:#7c8594;
+  --accent:#56b6c2;--accent2:#98c379;--warn:#e5c07b;--pink:#c678dd;
+  --mono:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Segoe UI,Roboto,sans-serif;
+  --r:14px;--max:1120px
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:17px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+img{max-width:100%;height:auto;display:block}
+code,kbd,pre{font-family:var(--mono)}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 20px}
+/* Kopf */
+header.top{position:sticky;top:0;z-index:10;background:rgba(15,18,23,.82);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;gap:20px;height:60px}
+.logo{font:800 20px var(--mono);color:var(--text);letter-spacing:-.3px;white-space:nowrap}
+.logo span{color:var(--accent)}
+nav.links{display:flex;gap:18px;margin-left:auto;font-size:15px}
+nav.links a{color:var(--muted)}
+nav.links a:hover{color:var(--text);text-decoration:none}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:10px;font-weight:650;font-size:16px;border:1px solid var(--line);color:var(--text);background:var(--card)}
+.btn:hover{text-decoration:none;border-color:#3a4352}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#081014}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn svg{width:18px;height:18px}
+/* Hero */
+.hero{position:relative;padding:72px 0 40px;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:-200px -100px auto auto;width:900px;height:700px;background:radial-gradient(closest-side,rgba(31,58,74,.75),transparent);pointer-events:none}
+.hero::after{content:"";position:absolute;left:-200px;bottom:-250px;width:800px;height:600px;background:radial-gradient(closest-side,rgba(42,33,64,.7),transparent);pointer-events:none}
+.hero .wrap{position:relative;z-index:1}
+.eyebrow{display:inline-block;font:600 13px var(--mono);color:var(--accent);background:rgba(86,182,194,.1);border:1px solid rgba(86,182,194,.25);padding:5px 10px;border-radius:999px;margin-bottom:18px}
+h1{font-size:clamp(34px,5.4vw,60px);line-height:1.08;letter-spacing:-1.2px;margin:0 0 18px;max-width:16ch}
+.lead{font-size:clamp(17px,2vw,20px);color:var(--muted);max-width:60ch;margin:0 0 28px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:22px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+.chips li{font-size:14px;font-weight:600;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:#dfe4ea}
+.chips li::before{content:"✓ ";color:var(--accent2)}
+.term{margin-top:44px;border-radius:12px;overflow:hidden;border:1px solid #2b313c;box-shadow:0 30px 90px rgba(0,0,0,.55);background:#15171c}
+.term img{width:100%;height:auto}
+/* Raster-Elemente dürfen schmaler werden als ihr Inhalt — sonst drückt eine lange
+   Befehlszeile im Code-Block die ganze Seite auf dem Handy in die Breite */
+.grid>*,.tools>*,.shots>*,.steps>*{min-width:0}
+.caption{font-size:14px;color:var(--dim);margin-top:10px;text-align:center}
+/* Abschnitte */
+section{padding:72px 0;border-top:1px solid var(--line)}
+section.alt{background:var(--bg2)}
+h2{font-size:clamp(26px,3.4vw,38px);line-height:1.15;letter-spacing:-.6px;margin:0 0 12px}
+.sub{color:var(--muted);max-width:62ch;margin:0 0 36px}
+.grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px 22px 20px}
+.card h3{margin:0 0 8px;font-size:19px;display:flex;align-items:center;gap:10px}
+.card h3 b{font:700 15px var(--mono);color:var(--accent);background:rgba(86,182,194,.12);border-radius:8px;padding:3px 8px}
+.card p{margin:0;color:var(--muted);font-size:16px}
+.tools{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.tool{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.tool strong{display:block;font-size:16px;margin-bottom:2px}
+.tool span{font-size:14.5px;color:var(--muted)}
+.shots{display:grid;gap:26px;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));align-items:start}
+.shots figure{margin:0}
+.shots img{border-radius:10px;border:1px solid #2b313c;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.shots figcaption{font-size:14.5px;color:var(--muted);margin-top:10px}
+.shots figcaption b{color:var(--text)}
+/* Vergleich */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:15.5px}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--card);font-size:14px;color:var(--muted);font-weight:650}
+tbody th{font-weight:650;color:var(--text);width:26%}
+td.us{color:var(--text)}
+td.them{color:var(--muted)}
+tr:last-child th,tr:last-child td{border-bottom:0}
+.note{font-size:13.5px;color:var(--dim);margin-top:12px}
+/* Schnellstart */
+.steps{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.step{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.step h3{margin:0 0 6px;font-size:17px}
+.step p{margin:0 0 12px;color:var(--muted);font-size:15.5px}
+.code{position:relative;background:#0b0e13;border:1px solid #232a35;border-radius:10px;padding:14px 16px;font:14px/1.6 var(--mono);color:#d7dae0;overflow-x:auto;white-space:pre}
+.code .c{color:#6b7380}
+.code .p{color:var(--accent)}
+.copy{position:absolute;top:8px;right:8px;font:600 12px var(--sans);color:var(--muted);background:#1b212b;border:1px solid #2b3340;border-radius:7px;padding:4px 9px;cursor:pointer}
+.copy:hover{color:var(--text)}
+kbd{font-size:.88em;background:#1b212b;border:1px solid #2b3340;border-bottom-width:2px;border-radius:6px;padding:1px 6px;color:var(--text)}
+/* Fuß */
+footer{border-top:1px solid var(--line);padding:40px 0 56px;color:var(--dim);font-size:15px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center}
+footer .sp{margin-left:auto}
+.coffee{display:inline-flex;align-items:center;gap:8px;background:#ffdd00;color:#1b1b1b;font-weight:700;border-radius:10px;padding:9px 14px}
+.coffee:hover{text-decoration:none;filter:brightness(1.05)}
+@media (max-width:760px){
+  nav.links{display:none}
+  header.top .btn{margin-left:auto}
+  .hero{padding-top:48px}
+  section{padding:56px 0}
+  footer .sp{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="#top"><span>$</span> update-all</a>
+    <nav class="links" aria-label="Seitennavigation">
+      <a href="#warum">Warum</a>
+      <a href="#was">Was es aktualisiert</a>
+      <a href="#bilder">Bilder</a>
+      <a href="#vergleich">Vergleich</a>
+      <a href="#start">Schnellstart</a>
+    </nav>
+    <a class="btn" href="https://github.com/Bingerminger/update-all" aria-label="update-all auf GitHub">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub
+    </a>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <span class="eyebrow">zsh · tmux · MIT · Version {{VERSION}}</span>
+      <h1>Ein Befehl hält den ganzen Mac aktuell.</h1>
+      <p class="lead">Auch per SSH vom iPhone — ohne einen einzigen Dialog auf dem Mac-Schirm. macOS, Homebrew, App Store, TeX Live, npm, Python, VS Code und KI-Werkzeuge in einem Lauf, mit einer tmux-Ansicht, die einen Verbindungsabbruch übersteht, Sicherheitsnetzen gegen ungewollte Sprünge und einer Aufgabenliste für alles, was du danach entscheiden musst.</p>
+      <div class="cta">
+        <a class="btn primary" href="#start">Schnellstart</a>
+        <a class="btn" href="https://github.com/Bingerminger/update-all">Quellcode auf GitHub</a>
+      </div>
+      <ul class="chips">
+        <li>übersteht SSH-Abbrüche</li>
+        <li>keine Dialoge</li>
+        <li>Sicherheitsnetze</li>
+        <li>Aktionen mit Fix-Befehl</li>
+        <li>kein Dienst, kein Daemon</li>
+      </ul>
+      <div class="term">
+        <img src="assets/demo.gif" width="1368" height="801" alt="update-all im Lauf: links Status und Fortschritt, rechts das Live-Log, unten die Aktionen">
+      </div>
+      <p class="caption">Aufnahme eines <code>--dry-run</code> — nichts wird installiert.</p>
+    </div>
+  </div>
+
+  <section id="warum">
+    <div class="wrap">
+      <h2>Gebaut für den Mac, vor dem gerade niemand sitzt</h2>
+      <p class="sub">Per SSH vom Laptop, vom iPad oder vom iPhone — während der Bildschirm daheim aus ist und niemand ein Fenster wegklicken kann.</p>
+      <div class="grid">
+        <div class="card"><h3><b>tmux</b> Läuft weiter, wenn die Verbindung abreißt</h3><p>Funkloch, Zug im Tunnel, iPhone gesperrt: Beim nächsten <code>update-all</code> hängst du dich einfach wieder an. Ohne Hintergrunddienst — und der Mac bleibt wach, solange der Lauf dauert.</p></div>
+        <div class="card"><h3><b>0</b> Kein Dialog auf dem Mac-Schirm</h3><p>Keine Gatekeeper-Rückfrage nach einem Cask-Update, keine Automation-Abfrage beim Beenden laufender Apps, kein fünffaches Admin-Passwort — einmal abgefragt, an jeden Schritt weitergereicht.</p></div>
+        <div class="card"><h3><b>dev</b> Gemacht für Entwickler-Macs</h3><p>Globale npm-, bun- und pnpm-Pakete, pipx und uv tools, Rust, Composer, mise/asdf, gcloud, helm, gh-Extensions, VS-Code-Extensions, Claude Code samt Plugins, codex — nur, was installiert ist.</p></div>
+        <div class="card"><h3><b>netz</b> Sicherheitsnetze statt Überraschungen</h3><p>Apps mit eigenem Updater (VS Code, Docker Desktop, iTerm2, Cursor …) nur, wenn sie wirklich hinterherhinken. Bezahl-Upgrades sperrt eine Liste. macOS-Updates mit Neustart werden nur gemeldet.</p></div>
+        <div class="card"><h3><b>^X</b> Aufgabenliste statt Log-Wüste</h3><p>Was nach dem Lauf zu entscheiden ist, wird zur Aktion mit Erklärung und fertigem Befehl: <kbd>Enter</kbd> Details, <kbd>^X</kbd> ausführen, <kbd>^A</kbd> abhaken. Rückblick und Verlauf jederzeit.</p></div>
+        <div class="card"><h3><b>✓</b> Ehrlich</h3><p>Ein hängendes Tool gilt nie als „nichts zu tun“. Was der App Store als erledigt meldet, wird nachgeprüft. Eine kaputte App, die brew für aktuell hält, fällt auf. Die Nachkontrolle sagt, ob wirklich nichts mehr offen ist.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="was" class="alt">
+    <div class="wrap">
+      <h2>Was in einem Lauf aktuell wird</h2>
+      <p class="sub">Es erscheint nur, was auf dem Mac installiert ist — <code>update-all --list</code> zeigt die Abschnitte.</p>
+      <div class="tools">
+        <div class="tool"><strong>macOS</strong><span>Updates ohne Neustart installiert, mit Neustart gemeldet — samt fertigem Befehl.</span></div>
+        <div class="tool"><strong>Homebrew</strong><span>Formeln und Casks, Self-Updater nach App-Version, Ausschluss- und Major-Sperrliste, Brewfile-Snapshot.</span></div>
+        <div class="tool"><strong>Mac App Store</strong><span><code>mas upgrade</code> mit Nachprüfung und Erkennung doppelter Installationen.</span></div>
+        <div class="tool"><strong>TeX Live</strong><span><code>tlmgr</code> mit festgehaltenem Spiegel.</span></div>
+        <div class="tool"><strong>Microsoft Office</strong><span>Über die Homebrew-Casks; AutoUpdate still, wenn es nichts mehr zu tun hat.</span></div>
+        <div class="tool"><strong>Node.js</strong><span>npm, bun, pnpm, yarn global — nur Veraltetes, Major-Sprünge als Aktion.</span></div>
+        <div class="tool"><strong>Python, Rust, PHP</strong><span>pipx, uv tools, rustup/cargo, Composer, mise/asdf.</span></div>
+        <div class="tool"><strong>Cloud &amp; Shell</strong><span>gcloud, helm, gh-Extensions, Oh My Zsh, zinit.</span></div>
+        <div class="tool"><strong>Editoren &amp; KI</strong><span>VS-Code-Extensions, Claude Code samt Plugins, opencode, codex, pi, tldr.</span></div>
+        <div class="tool"><strong>Apps-Radar</strong><span>Sparkle-Feeds, Übernahme-Vorschläge für brew, eingestellte Casks, beschädigte App-Pakete.</span></div>
+        <div class="tool"><strong>Aufräumen</strong><span>brew cleanup, uv- und npm-Cache, Speicherbericht für Docker und alte Agent-Worktrees.</span></div>
+        <div class="tool"><strong>Opt-in</strong><span>Ollama-Modelle (<code>-m</code>), Docker-Images (<code>--docker</code>), MacUpdater (<code>--apps</code>).</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="bilder">
+    <div class="wrap">
+      <h2>Passt auf jeden Schirm</h2>
+      <p class="sub">Das Layout richtet sich nach dem Fenster: drei Bereiche am großen Monitor, schmaler am iPad, nur das Log am iPhone im Querformat — mit Restzeit im Rahmen.</p>
+      <div class="shots">
+        <figure><img src="assets/wide.png" loading="lazy" width="2736" height="1602" alt="Großer Schirm: Status, Live-Log und Aktionen"><figcaption><b>Großer Schirm</b> — Status, Live-Log, Aktionen.</figcaption></figure>
+        <figure><img src="assets/done.png" loading="lazy" width="2736" height="1602" alt="Nach dem Lauf: Fazit, Abschluss-Tafel und Aktionsliste"><figcaption><b>Nach dem Lauf</b> — Fazit, Tasten, Aktionsliste mit Details.</figcaption></figure>
+        <figure><img src="assets/ipad.png" loading="lazy" width="1594" height="990" alt="iPad: schmaleres Status-Pane"><figcaption><b>iPad</b> — schmaleres Status-Pane.</figcaption></figure>
+        <figure><img src="assets/iphone.png" loading="lazy" width="1392" height="786" alt="iPhone im Querformat: nur das Log, Fortschritt im Rahmen"><figcaption><b>iPhone quer</b> — nur das Log, Fortschritt im Rahmen.</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="vergleich" class="alt">
+    <div class="wrap">
+      <h2>Warum nicht einfach topgrade?</h2>
+      <p class="sub"><a href="https://github.com/topgrade-rs/topgrade">topgrade</a> ist großartig, wenn ein Befehl viele Plattformen und Hunderte Werkzeuge abdecken soll. update-all ist enger — nur macOS —, dafür tiefer und gebaut für den unbeaufsichtigten Lauf per SSH.</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th></th><th>update-all</th><th>topgrade</th></tr></thead>
+          <tbody>
+            <tr><th>Plattformen</th><td class="us">macOS</td><td class="them">macOS, Linux, Windows, BSD</td></tr>
+            <tr><th>tmux</th><td class="us">immer (sofern installiert); Layout nach Fenstergröße; erneuter Aufruf hängt sich an den laufenden Lauf</td><td class="them">optional (<code>--tmux</code>)</td></tr>
+            <tr><th>Wenn ein Schritt scheitert</th><td class="us">weiterlaufen, als Aktion mit Fix-Befehl sammeln</td><td class="them">fragt standardmäßig nach („Retry?“), abschaltbar</td></tr>
+            <tr><th>Apps mit eigenem Updater</th><td class="us">je App nach Bundle-Version; Ausschlussliste, Major-Sperrliste</td><td class="them">Schalter <code>greedy_cask</code>, <code>greedy_auto_updates</code> für alle</td></tr>
+            <tr><th>macOS-Updates mit Neustart</th><td class="us">nur melden, mit fertigem Befehl</td><td class="them">—</td></tr>
+            <tr><th>Nach dem Lauf</th><td class="us">Aktionsliste, Rückblick, Verlauf, Log je Lauf</td><td class="them">Zusammenfassung im Terminal</td></tr>
+            <tr><th>Benachrichtigung</th><td class="us">optional per ntfy</td><td class="them">Desktop-Benachrichtigung am Mac</td></tr>
+            <tr><th>Sprache · Lizenz</th><td class="us">zsh, ein Skript · MIT</td><td class="them">Rust · GPL-3.0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Angaben zu topgrade laut dessen README, <code>config.example.toml</code> und Quelltext, Version 17.16.0 (November 2026).</p>
+    </div>
+  </section>
+
+  <section id="start">
+    <div class="wrap">
+      <h2>Schnellstart</h2>
+      <p class="sub">Kein Installer, kein Dienst: ein Skript klonen, ausprobieren, loslegen. tmux, fzf und jq sind optional, aber empfohlen.</p>
+      <div class="steps">
+        <div class="step">
+          <h3>1 · Holen</h3>
+          <p>Ansicht, Aktionsliste und Cask-Auswertung brauchen tmux, fzf und jq.</p>
+          <div class="code"><button class="copy" type="button">Kopieren</button><span class="p">$</span> brew install tmux fzf jq
+<span class="p">$</span> git clone https://github.com/Bingerminger/update-all.git ~/update-all</div>
+        </div>
+        <div class="step">
+          <h3>2 · Gefahrlos ansehen</h3>
+          <p>Der Dry-Run simuliert alles, <code>--check</code> zeigt, was anstünde.</p>
+          <div class="code"><button class="copy" type="button">Kopieren</button><span class="p">$</span> ~/update-all/update-all.sh --dry-run
+<span class="p">$</span> ~/update-all/update-all.sh --check</div>
+        </div>
+        <div class="step">
+          <h3>3 · Loslegen</h3>
+          <p>Der echte Lauf — als Kurzbefehl mit <code>-y</code>, das Rückfragen mit ja beantwortet.</p>
+          <div class="code"><button class="copy" type="button">Kopieren</button><span class="c"># in ~/.zshrc</span>
+alias uu="$HOME/update-all/update-all.sh -y"</div>
+        </div>
+      </div>
+      <p class="note" style="margin-top:22px">Alle Schalter, Einstellungen und der Remote-Betrieb: <a href="https://github.com/Bingerminger/update-all#readme">README</a> · Beispiel-Konfiguration: <a href="https://github.com/Bingerminger/update-all/blob/main/prefs.example">prefs.example</a> · Änderungen: <a href="https://github.com/Bingerminger/update-all/blob/main/CHANGELOG.md">CHANGELOG</a></p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span><span style="color:var(--accent);font-family:var(--mono)">$</span> update-all {{VERSION}} · <a href="https://github.com/Bingerminger/update-all/blob/main/LICENSE">MIT</a></span>
+    <a href="https://github.com/Bingerminger/update-all">GitHub</a>
+    <a href="https://github.com/Bingerminger/update-all/blob/main/CONTRIBUTING.md">Mitmachen</a>
+    <a href="https://github.com/Bingerminger/update-all/blob/main/SECURITY.md">Sicherheit</a>
+    <span class="sp"><a class="coffee" href="https://buymeacoffee.com/bingerminger">☕ Buy Me a Coffee</a></span>
+  </div>
+</footer>
+
+<script>
+// Kopieren-Knöpfe: kopiert den Befehlstext ohne Prompt-Zeichen und Kommentare
+document.querySelectorAll('.copy').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var box = b.parentElement, t = '';
+    box.childNodes.forEach(function (n) { if (n !== b) t += n.textContent; });
+    t = t.split('\n').map(function (l) { return l.replace(/^\$ /, ''); })
+         .filter(function (l) { return l.trim() && !/^#/.test(l.trim()); }).join('\n');
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject())
+      .then(function () { b.textContent = 'Kopiert'; setTimeout(function () { b.textContent = 'Kopieren'; }, 1600); })
+      .catch(function () { b.textContent = 'Markieren und kopieren'; });
+  });
+});
+</script>
+</body>
+</html>

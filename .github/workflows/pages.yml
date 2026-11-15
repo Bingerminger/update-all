@@ -1,0 +1,75 @@
+name: Projektseite
+
+# Die Projektseite auf GitHub Pages (https://bingerminger.github.io/update-all/): site/ plus
+# die Bilder aus docs/ (tools/build-site.sh). Gebaut wird aus dem neuesten Release-Tag — die
+# Seite zeigt, was veröffentlicht ist, nicht den Stand von main:
+#   • beim Veröffentlichen eines GitHub-Releases
+#   • von Hand
+# Kennt der Tag tools/build-site.sh noch nicht, baut der Lauf aus main.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+# Gebaut wird nur mit Leserechten; schreiben darf allein der Job, der veröffentlicht,
+# und der führt nur Actions von GitHub selbst aus.
+permissions:
+  contents: read
+
+# Eine Veröffentlichung zur Zeit; eine neuere ersetzt eine wartende.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Seite bauen
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Neuestes Release auschecken
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          TAG="$RELEASE_TAG"
+          if [ -z "$TAG" ]; then
+            TAG=$(git tag --list 'v*' --sort=-version:refname | head -n1)
+          fi
+          if [ -n "$TAG" ] && git cat-file -e "$TAG:tools/build-site.sh" 2>/dev/null; then
+            git checkout --quiet "$TAG"
+            echo "Seite aus $TAG"
+          else
+            echo "Seite aus main (${TAG:-kein Tag} enthält tools/build-site.sh noch nicht)"
+          fi
+
+      - name: Seite bauen
+        run: |
+          bash tools/build-site.sh --check
+          bash tools/build-site.sh dist/site
+
+      - name: Hochladen
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist/site
+
+  deploy:
+    name: Seite veröffentlichen
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Pages einrichten
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - name: Veröffentlichen
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

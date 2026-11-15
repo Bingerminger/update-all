@@ -7,6 +7,8 @@
 **Ein Befehl hält den ganzen Mac aktuell — auch per SSH vom iPhone, ohne einen einzigen Dialog auf dem Mac-Schirm.**
 macOS, Homebrew, App Store, TeX Live, npm, Python, VS Code, KI-Werkzeuge und mehr in einem Lauf — mit einer tmux-Ansicht, die einen Verbindungsabbruch übersteht, Sicherheitsnetzen gegen ungewollte Sprünge und einer Aufgabenliste für alles, was du danach entscheiden musst. Ein einziges zsh-Skript. Kein Dienst, kein Daemon, keine Installation.
 
+**▶ [Projektseite](https://bingerminger.github.io/update-all/)** — alles auf einen Blick, mit Aufnahmen und Schnellstart.
+
 [![Prüfen](https://github.com/Bingerminger/update-all/actions/workflows/ci.yml/badge.svg)](https://github.com/Bingerminger/update-all/actions/workflows/ci.yml)
 [![Lizenz: MIT](https://img.shields.io/badge/Lizenz-MIT-blue.svg)](LICENSE)
 ![macOS](https://img.shields.io/badge/macOS-Apple%20Silicon-lightgrey.svg)

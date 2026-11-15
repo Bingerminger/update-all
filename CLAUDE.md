@@ -13,6 +13,15 @@ und wird nur genutzt, wenn es installiert ist.
 
 Ausgaben, Kommentare und Doku sind **deutsch** — beibehalten.
 
+## Projektseite
+
+`site/index.html` (+ `404.html`) ist die Projektseite auf https://bingerminger.github.io/update-all/.
+`tools/build-site.sh [ziel]` setzt sie mit den Bildern aus `docs/` und `.github/` zusammen und
+ersetzt `{{VERSION}}`; `--check` prüft nur, ob jedes eingebundene Bild existiert. Der Workflow
+`pages.yml` baut beim Veröffentlichen eines GitHub-Releases aus dessen Tag (oder von Hand) —
+die Seite zeigt, was veröffentlicht ist, nicht den Stand von `main`. Lokal ansehen: bauen und
+`python3 -m http.server -d dist/site`. Keine externen Ressourcen (Schriften, CDNs, Tracking).
+
 ## Versionierung
 
 `VERSION` im Kopf von `update-all.sh`: MAJOR = neues Bedienkonzept, MINOR = neue Abschnitte/Schalter,
