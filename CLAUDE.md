@@ -21,6 +21,9 @@ ersetzt `{{VERSION}}`; `--check` prüft nur, ob jedes eingebundene Bild existier
 `pages.yml` baut beim Veröffentlichen eines GitHub-Releases aus dessen Tag (oder von Hand) —
 die Seite zeigt, was veröffentlicht ist, nicht den Stand von `main`. Lokal ansehen: bauen und
 `python3 -m http.server -d dist/site`. Keine externen Ressourcen (Schriften, CDNs, Tracking).
+Die Umgebung `github-pages` muss Deployments aus Tags `v*` zulassen (Settings → Environments →
+github-pages, neben `main`) — sonst lehnt GitHub das Veröffentlichen aus dem Release-Tag ab
+(„Tag … is not allowed to deploy to github-pages due to environment protection rules“).
 
 ## Versionierung
 
