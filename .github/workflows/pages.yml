@@ -1,11 +1,11 @@
 name: Projektseite
 
 # Die Projektseite auf GitHub Pages (https://bingerminger.github.io/update-all/): site/ plus
-# die Bilder aus docs/ (tools/build-site.sh). Gebaut wird aus dem neuesten Release-Tag — die
-# Seite kommt aus main, die angezeigte Version ist die des neuesten Releases:
+# die Bilder aus docs/ (tools/build-site.sh). Gebaut wird aus main — Texte, Links und das
+# Impressum lassen sich so ohne Release nachziehen; angezeigt wird die Version des neuesten
+# Releases. Ausgelöst:
 #   • beim Veröffentlichen eines GitHub-Releases
 #   • von Hand
-# Kennt der Tag tools/build-site.sh noch nicht, baut der Lauf aus main.
 on:
   release:
     types: [published]
