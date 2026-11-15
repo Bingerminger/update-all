@@ -20,9 +20,10 @@ macOS, Homebrew, App Store, TeX Live, npm, Python, VS Code, KI-Werkzeuge und meh
 
 Gebaut für einen Mac, der meistens **aus der Ferne** gepflegt wird: per SSH vom Laptop, vom iPad oder vom iPhone — während der Bildschirm daheim aus ist und niemand davorsitzt, um ein Fenster wegzuklicken.
 
+- **Gemacht für Entwickler-Macs.** Neben macOS, Homebrew und App Store hält ein Lauf auch den Werkzeugkasten aktuell: globale npm-, bun- und pnpm-Pakete, pipx und uv tools, Rust, Composer, mise/asdf, gcloud, helm, gh-Extensions, VS-Code-Extensions, Claude Code samt Plugins, codex, TeX Live — und auf Wunsch Docker-Images und Ollama-Modelle.
 - **Läuft weiter, wenn die Verbindung abreißt.** Der Lauf steckt in tmux. Funkloch, Zug im Tunnel, iPhone gesperrt: Beim nächsten `update-all` hängst du dich einfach wieder an. Ohne Hintergrunddienst, ohne LaunchAgent — und der Mac bleibt wach, solange der Lauf dauert.
 - **Kein Dialog auf dem Mac-Schirm.** Keine Gatekeeper-Rückfrage nach einem Cask-Update, keine Automation-Abfrage beim Beenden laufender Apps, kein fünffaches Admin-Passwort. update-all fragt es einmal ab und reicht es an jeden Schritt weiter — auch nach Homebrews Ticket-Reset.
-- **Sicherheitsnetze statt Überraschungen.** Apps mit eigenem Updater hebt update-all nur, wenn sie wirklich hinterherhinken. Bezahl-Upgrades sperrt eine Liste. Was beim Update kaputtgeht (Parallels), fasst brew nie an. macOS-Updates mit Neustart meldet es nur — den Zeitpunkt wählst du.
+- **Sicherheitsnetze statt Überraschungen.** Apps mit eigenem Updater (VS Code, Docker Desktop, iTerm2, Cursor …) hebt update-all nur, wenn sie wirklich hinterherhinken. Bezahl-Upgrades wie bei BBEdit oder Geekbench sperrt eine Liste. Laufende Apps beendet es sauber und startet sie danach wieder — Docker Desktop darf vorher seine VM herunterfahren. Was beim Update kaputtgeht (Parallels), fasst brew nie an. macOS-Updates mit Neustart meldet es nur — den Zeitpunkt wählst du.
 - **Eine Aufgabenliste statt Log-Wüste.** Alles, was nach dem Lauf zu entscheiden ist, wird zur Aktion mit Erklärung und fertigem Befehl: `Enter` zeigt Details, `^X` führt den Fix aus, `^A` hakt ab. Ein unveränderter Hinweis aus dem letzten Lauf zählt nicht noch einmal als offen.
 - **Ehrlich.** Ein hängendes Tool gilt nie als „nichts zu tun“. Was der App Store als erledigt meldet, wird nachgeprüft. Eine kaputte App, die brew für aktuell hält, fällt auf. Die Nachkontrolle am Ende sagt, ob wirklich nichts mehr offen ist.
 - **Passt auf jeden Schirm.** Das Layout richtet sich nach dem Fenster: drei Bereiche am großen Monitor, schmaler am iPad, nur das Log am iPhone im Querformat — mit Restzeit („noch ca. 4 min“) im Rahmen.
@@ -44,13 +45,13 @@ Es erscheint nur, was auf dem Mac installiert ist (`update-all --list`).
 | Abschnitt | Was passiert |
 |---|---|
 | **macOS** | Updates ohne Neustart werden installiert (Safari, XProtect …), Updates mit Neustart gemeldet — mit Größe und fertigem Befehl. |
-| **Homebrew** | Formeln und Casks. Self-Updater-Casks nach Bundle-Version der App, Ausschluss- und Major-Sperrliste, laufende Apps sauber beenden und wieder starten, Quarantäne nur dort entfernen, wo Gatekeeper sonst nachfragen würde. Brewfile-Snapshot nach jedem Lauf. |
+| **Homebrew** | Formeln und Casks. Self-Updater-Casks (VS Code, Docker Desktop, iTerm2, JetBrains Toolbox …) nach Bundle-Version der App, Ausschluss- und Major-Sperrliste, laufende Apps sauber beenden und wieder starten, Quarantäne nur dort entfernen, wo Gatekeeper sonst nachfragen würde (z. B. bei CLI-Casks wie codex). Brewfile-Snapshot nach jedem Lauf. |
 | **TeX Live** | `tlmgr update --self --all` mit festgehaltenem Spiegel (CTAN verteilt jeden Aufruf neu). |
 | **Mac App Store** | `mas upgrade` mit Nachprüfung und Erkennung doppelt installierter Apps. |
 | **Microsoft Office** | Über die Homebrew-Casks; Microsoft AutoUpdate wird stillgelegt, wenn es nichts mehr zu tun hat. |
 | **Node.js** | Globale npm/bun/pnpm/yarn-Pakete — nur, was veraltet ist; Major-Sprünge als Aktion. |
 | **Python, Rust, PHP, mise/asdf** | pipx, uv tools, rustup/cargo, Composer global, Runtime-Manager. |
-| **Cloud & Shell** | gcloud, helm, gh, Oh My Zsh, zinit. |
+| **Cloud & Shell** | gcloud, helm, gh-Extensions, Oh My Zsh, zinit. |
 | **Editoren** | VS-Code-Extensions. |
 | **KI-Werkzeuge** | Claude Code samt Plugins, opencode, codex, pi, tldr. |
 | **Opt-in** | Ollama-Modelle (`-m`), Docker-Images mit Floating-Tags (`--docker`), manuell installierte Apps per MacUpdater (`--apps`). |
@@ -131,9 +132,12 @@ Ohne Konfiguration läuft update-all mit sinnvollen Standards. Alle Einstellunge
 # nie per brew heben (Muster erlaubt)
 cask_exclude=parallels,parallels-toolbox
 # Major-Sprung gesperrt — für Bezahl-Upgrades
-major_block=geekbench*
-# nie zur Übernahme in brew vorschlagen (Cask-Name oder Bundle-ID)
-adopt_ignore=parallels,com.example.*
+major_block=geekbench*,bbedit
+# nie zur Übernahme in brew vorschlagen (Cask-Name oder Bundle-ID) —
+# z. B. die JetBrains-IDEs, die die Toolbox pflegt
+adopt_ignore=parallels,com.jetbrains.*
+# laufende Container nie für ein Update unterbrechen
+never_quit=docker-desktop,orbstack
 # Fenster in deiner laufenden tmux-Arbeitssession öffnen
 tmux_session=work
 ```
@@ -159,6 +163,10 @@ Rückfragen lassen sich merken: `i` = immer, `x` = nie (landet in den prefs).
 - Der Workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) fährt beides samt Dry-Run auf einem macOS-Runner.
 
 Was als Nächstes kommt: [ROADMAP.md](ROADMAP.md). Was sich geändert hat: [CHANGELOG.md](CHANGELOG.md).
+
+## Mitmachen
+
+Fehlerberichte, Ideen für weitere Werkzeuge und Pull Requests sind willkommen — wie es geht, steht in [CONTRIBUTING.md](CONTRIBUTING.md). Sicherheitslücken bitte privat melden, siehe [SECURITY.md](SECURITY.md).
 
 ## Lizenz
 

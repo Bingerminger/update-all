@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Sicherheitslücke melden / Report a vulnerability
+    url: https://github.com/Bingerminger/update-all/security/advisories/new
+    about: Bitte nicht öffentlich / Please not in public
+  - name: Dokumentation / Documentation
+    url: https://github.com/Bingerminger/update-all#readme
+    about: Schnellstart, Schalter, Remote-Betrieb, Konfiguration / Quick start, switches, remote use, configuration
+  - name: Verhaltensregeln / Code of conduct
+    url: https://github.com/Bingerminger/update-all/blob/main/CODE_OF_CONDUCT.md
+    about: Freundlich, beim Thema, keine echten Daten / Kind, on topic, no real data

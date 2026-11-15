@@ -5,7 +5,8 @@
 # Nichts davon ist Pflicht: ohne prefs läuft update-all mit sinnvollen Standards.
 # Kopieren:  mkdir -p ~/.config/update-all && cp prefs.example ~/.config/update-all/prefs
 #
-# Listen sind kommagetrennt; wo „Muster“ steht, gelten zsh-Muster wie microsoft-* oder geekbench*.
+# Listen sind kommagetrennt; wo „Muster“ steht, gelten zsh-Muster wie microsoft-*, geekbench*
+# oder com.jetbrains.*.
 
 # ── Rückfragen ──────────────────────────────────────────────────────────────
 # Gemerkte Antworten (bei einer Rückfrage mit i = immer bzw. x = nie gesetzt).
@@ -22,17 +23,22 @@
 
 # Self-Updater-Casks, deren Major-Sprung gesperrt ist — für Apps, bei denen eine neue
 # Hauptversion Geld oder eine neue Lizenz kostet (Muster; leerer Wert schaltet ab).
+# Nicht für Apps, deren Versionsnummer ohnehin springt: der Cask sublime-text zählt nur
+# Build-Nummern und bekäme gesperrt nie ein Update, JetBrains-IDEs zählen nach Jahr und
+# bekämen nur noch Updates innerhalb des Jahres.
 # Standard: geekbench*
-#major_block=geekbench*,carbon-copy-cloner,omnifocus
+#major_block=geekbench*,bbedit,carbon-copy-cloner
 
 # Casks, die nie über eine laufende App hinweg gehoben werden (Muster). Laufende Apps
-# der übrigen Casks beendet update-all selbst per SIGTERM und startet sie danach wieder.
-#never_quit=docker-desktop
+# der übrigen Casks beendet update-all selbst per SIGTERM und startet sie danach wieder —
+# Docker Desktop und OrbStack fahren dabei erst ihre VM herunter; wer laufende Container
+# nie unterbrechen will, trägt sie hier ein.
+#never_quit=docker-desktop,orbstack
 
 # Manuell installierte Apps, die der Apps-Radar NIE zur Übernahme in brew vorschlägt —
-# Muster gegen Cask-Namen ODER Bundle-ID (z. B. eine App-Familie, die ihr eigener Launcher
-# pflegt). Standard: parallels. Ein eigener Wert ersetzt den Standard.
-#adopt_ignore=parallels,com.example.*
+# Muster gegen Cask-Namen ODER Bundle-ID, z. B. die JetBrains-IDEs, die die Toolbox
+# installiert und aktualisiert. Standard: parallels. Ein eigener Wert ersetzt den Standard.
+#adopt_ignore=parallels,com.jetbrains.*
 
 # ── Ansicht (tmux) ──────────────────────────────────────────────────────────
 # Außerhalb von tmux: das Fenster in dieser Session öffnen, wenn sie läuft (z. B. deine

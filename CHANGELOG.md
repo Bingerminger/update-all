@@ -4,6 +4,17 @@ Versionierung: **MAJOR** bei neuem Bedienkonzept (3 = tmux-TUI), **MINOR** bei n
 Abschnitten oder Schaltern, **PATCH** bei Fehlerbehebungen. Die Nummer steht im Banner, im
 Status-Pane, in `history.tsv` und hinter `--version`.
 
+## 3.4.2 — 2026-11-15
+
+- Beispiele für Entwickler-Macs in README, `prefs.example` und Kommentaren: JetBrains-IDEs
+  aus der Toolbox per `adopt_ignore=com.jetbrains.*` ausnehmen, Docker Desktop/OrbStack in
+  `never_quit`, BBEdit in `major_block`; warum Casks wie `sublime-text` (Build-Nummer als
+  Version) nicht in die Major-Sperrliste gehören.
+- Mitmachen: `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, Issue-Vorlagen
+  (Fehler, Idee), Pull-Request-Vorlage, Dependabot für die Actions.
+- TUI-Tests: der tmux-Testserver läuft immer mit zsh (auf CI-Runnern ist `$SHELL` bash).
+- CI: `actions/checkout` per Commit-SHA gepinnt.
+
 ## 3.4.1 — 2026-11-15
 
 - Eigenes Repository; persönliche Standards entkoppelt:

@@ -1,0 +1,9 @@
+# Actions aktuell halten. Sie sind per Commit-SHA gepinnt (Kommentar = Version);
+# Dependabot hebt SHA und Kommentar gemeinsam und schlägt das als Pull Request vor —
+# nichts wird automatisch übernommen. update-all selbst hat keine Paketabhängigkeiten.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"

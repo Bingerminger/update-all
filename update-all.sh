@@ -66,7 +66,7 @@
 #                                                                  App hinweg heben; Muster erlaubt)
 #                                              adopt_ignore=a,b   (nie als Cask vorschlagen; Muster gegen
 #                                                                  Cask-Namen ODER Bundle-ID, z. B.
-#                                                                  parallels,com.example.*)
+#                                                                  parallels,com.jetbrains.*)
 #                                              npm_cache=always|never (npm-Cache ab 3 GB leeren; mit -y
 #                                                                  ohne Nachfrage)
 #                                              tmux_session=NAME  (Fenster dort öffnen, wenn die Session
@@ -115,7 +115,7 @@ zmodload zsh/datetime
 # Versionierung: MAJOR bei neuem Bedienkonzept (3 = tmux-TUI), MINOR bei neuen
 # Abschnitten/Schaltern, PATCH bei Fixes. Steht im Banner, im Status-Pane,
 # in history.tsv und hinter --version.
-VERSION="3.4.1"
+VERSION="3.4.2"
 
 # ── Guards ──────────────────────────────────────────────────────
 [[ $EUID -eq 0 ]] && { echo "❌  Nicht als root ausführen."; exit 1; }
@@ -649,10 +649,11 @@ scan_output() {
 
 # adopt_ignored <liste> <cask-token> <bundle-id> — 0, wenn ein Eintrag der Liste (Komma,
 # zsh-Muster) auf den Cask-Namen ODER die Bundle-ID der App passt. Über die Bundle-ID lässt
-# sich eine ganze Herstellerfamilie ausnehmen: adopt_ignore=parallels,com.example.* — etwa
-# eine App-Familie, die ihr eigener Launcher installiert und aktualisiert. Bis 3.3.6 schlug
-# der Radar ein Dutzend solcher Apps in jedem Lauf zum --adopt vor, und eine Namensliste wäre
-# mit jeder neuen App der Familie veraltet.
+# sich eine ganze Herstellerfamilie ausnehmen: adopt_ignore=parallels,com.jetbrains.* — etwa
+# die JetBrains-IDEs, die die Toolbox installiert und aktualisiert (für IntelliJ IDEA,
+# PyCharm, WebStorm … gibt es auch Casks, der Radar schlüge sie sonst zur Übernahme vor).
+# Bis 3.3.6 schlug der Radar ein Dutzend solcher Apps in jedem Lauf zum --adopt vor, und
+# eine Namensliste wäre mit jeder neuen App der Familie veraltet.
 adopt_ignored() {
   local e
   for e in ${(s:,:)1}; do
@@ -1062,9 +1063,12 @@ sec_brew() {
   # erlaubt, Standard geekbench*): In einem Monat gab es rund 65 Major-Warnungen und
   # keinen einzigen Lizenzfall — Teams zählt Datumsversionen (26261 → 26276, jede Version
   # ein „Major“), Sonos trägt die Tap-Version nur als Build (Kurzversion 17.2.5, Build
-  # 90.0.82050 = Tap), Firefox/Thunderbird/Chrome/Claude springen regelmäßig. Der
-  # Homebrew-Abschnitt war dadurch in 35 von 40 Läufen gelb. Gesperrt wird nur noch, was
-  # beim Sprung Geld oder eine neue Lizenz kostet. 'major_block=' (leer) schaltet ganz ab.
+  # 90.0.82050 = Tap), Firefox/Thunderbird/Chrome/Claude springen regelmäßig. Bei
+  # Entwickler-Werkzeugen ist es nicht anders: der Cask sublime-text trägt als Version nur
+  # die Build-Nummer (4215 → 4216 ist ein „Major“), JetBrains-IDEs zählen nach Jahr
+  # (2026.3 → 2027.1). Der Homebrew-Abschnitt war dadurch in 35 von 40 Läufen gelb.
+  # Gesperrt wird nur noch, was beim Sprung Geld oder eine neue Lizenz kostet (z. B.
+  # Geekbench, BBEdit). 'major_block=' (leer) schaltet ganz ab.
   local excl=$(grep -s '^cask_exclude=' "$CONFDIR/prefs" | cut -d= -f2-); excl=${excl:-parallels,parallels-toolbox}
   local mblk='geekbench*'
   grep -qs '^major_block=' "$CONFDIR/prefs" && mblk=$(grep -s '^major_block=' "$CONFDIR/prefs" | tail -1 | cut -d= -f2-)

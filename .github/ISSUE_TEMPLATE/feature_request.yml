@@ -1,0 +1,35 @@
+name: Idee oder Wunsch / Idea or feature request
+description: Ein neues Werkzeug, ein Schalter, eine bessere Meldung / A new tool, a switch, a better message
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Danke für deine Idee!** Bitte erst kurz suchen, ob es sie schon gibt, und einen Blick in die [Roadmap](https://github.com/Bingerminger/update-all/blob/main/ROADMAP.md) werfen — dort steht auch, was bewusst nicht kommt (z. B. ein Hintergrunddienst).
+        **Thanks for your idea!** Please search first and check the roadmap, which also lists what is deliberately out of scope (e.g. a background service).
+  - type: textarea
+    id: goal
+    attributes:
+      label: Was möchtest du erreichen? / What do you want to achieve?
+      description: Die Aufgabe, nicht schon die Lösung. / The task, not the solution yet.
+      placeholder: "Ich möchte, dass … aktuell bleibt / I would like … to stay up to date"
+    validations:
+      required: true
+  - type: textarea
+    id: today
+    attributes:
+      label: Wie machst du es heute? / How do you do it today?
+      description: "Befehl, Werkzeug, von Hand … / Command, tool, by hand …"
+  - type: input
+    id: tool
+    attributes:
+      label: Werkzeug und Update-Befehl / Tool and update command
+      description: Falls es um ein neues Werkzeug geht / If it is about a new tool
+      placeholder: "foo self-update"
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Vorher geprüft / Checked first
+      options:
+        - label: Ich habe nach ähnlichen Ideen gesucht. / I searched for similar ideas.
+          required: true

@@ -1,0 +1,73 @@
+name: Fehler melden / Report a bug
+description: Etwas funktioniert nicht wie beschrieben / Something does not work as documented
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Danke! Thanks!
+
+        **Sicherheitslücken nicht hier melden / Do not report security issues here** — see [SECURITY.md](https://github.com/Bingerminger/update-all/blob/main/SECURITY.md).
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: "`update-all.sh --version`"
+      placeholder: "3.4.2"
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS und Mac / macOS and Mac
+      description: "`sw_vers -productVersion` · Apple Silicon oder Intel"
+      placeholder: "27.2 · Apple Silicon"
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Wie lief update-all? / How did it run?
+      multiple: true
+      options:
+        - Lokal im Terminal (tmux-Ansicht) / locally (tmux view)
+        - Per SSH (tmux-Ansicht) / via SSH (tmux view)
+        - "--plain (ohne tmux / without tmux)"
+        - "--check / --dry-run"
+        - "-y"
+        - Andere / Other
+    validations:
+      required: true
+  - type: input
+    id: section
+    attributes:
+      label: Abschnitt / Section
+      description: "Betroffener Abschnitt laut `--list`, falls bekannt / Affected section from `--list`, if known"
+      placeholder: "brew"
+  - type: textarea
+    id: what
+    attributes:
+      label: Was passiert? / What happens?
+      description: Und was hättest du erwartet? / And what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Schritte / Steps to reproduce
+      placeholder: |
+        1. …
+        2. …
+  - type: textarea
+    id: log
+    attributes:
+      label: Log-Ausschnitt / Log excerpt
+      description: "Aus `~/Library/Logs/update-all/runs/<zeitpunkt>.log` — nur den betroffenen Teil / only the relevant part"
+      render: text
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Datenschutz / Privacy
+      options:
+        - label: Keine persönlichen Daten im Text (Hostname, Benutzername, Pfade, App-Liste) — das Repository ist öffentlich. / No personal data in the text (host name, user name, paths, app list) — the repository is public.
+          required: true

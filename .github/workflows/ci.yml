@@ -21,7 +21,7 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: "1"
       HOMEBREW_NO_INSTALL_CLEANUP: "1"
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Werkzeuge
         # tmux + fzf für die Ansicht; mas und composer, weil die TUI-Tests diese Abschnitte nutzen
