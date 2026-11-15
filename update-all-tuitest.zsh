@@ -47,6 +47,10 @@
 
 setopt EXTENDED_GLOB NULL_GLOB
 unset TMUX_TMPDIR   # siehe oben — hier hat es nichts zu suchen
+# Die Prüfungen erwarten, dass das Grundfenster einer neuen Session "zsh" heißt. tmux nimmt
+# als Shell $SHELL beim Serverstart — auf CI-Runnern ist das bash (dort hieß das Fenster
+# "bash" und 14 Prüfungen schlugen fehl, obwohl die TUI richtig arbeitete).
+export SHELL=${commands[zsh]:-/bin/zsh}
 
 S=${0:A:h}/update-all.sh
 [[ -x $S ]] || { echo "update-all.sh nicht gefunden neben ${0:A}"; exit 2; }
